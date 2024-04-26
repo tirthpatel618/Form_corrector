@@ -2,6 +2,7 @@ import numpy as np
 import mediapipe as mp
 import numpy as np
 import cv2
+import math
 
 # Initialize mediapipe drawing and pose components
 mp_drawing = mp.solutions.drawing_utils
@@ -27,6 +28,7 @@ def get_angles():
     # Initialize video capture
     elbow_angle = []
     hand_angle = []
+    hip_angle = []
     cap = cv2.VideoCapture('/Users/tirthpatel/Desktop/project3/free_throw_made.mp4')
     print("func")
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
@@ -52,29 +54,24 @@ def get_angles():
                 landmarks = results.pose_landmarks.landmark
 
                 # Get the landmarks for the right arm
-                right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x, landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
-                right_elbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x, landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
-                right_wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x, landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+                right_shoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                right_elbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+                right_wrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
                 right_hand = [landmarks[mp_pose.PoseLandmark.RIGHT_PINKY.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_PINKY.value].y]
+                right_hip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
 
 
                 # Calculate the angle
                 angle = calculate_angle(right_shoulder, right_elbow, right_wrist)
                 cv2.putText(image, str(angle), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-                elbow_angle.append(angle) # Append the angle to the list
+                elbow_angle.append(round(angle, 1)) # Append the angle to the list
                 angle = calculate_angle(right_elbow, right_wrist, right_hand)
-                hand_angle.append(angle)
-                mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-                                        mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=2), 
-                                        mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2))
-
-            cv2.imshow('Pose Estimation', image)
-
+                hand_angle.append(round(angle, 1))
+                angle = calculate_angle(right_hip, right_shoulder, right_elbow)
+                hip_angle.append(round(angle, 1))
     cap.release()
     cv2.destroyAllWindows()
     return elbow_angle, hand_angle
 
-# Get the angles
-elbow_angle, hand_angle = get_angles()
-print(elbow_angle)
-print(hand_angle)
+
+
