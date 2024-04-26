@@ -30,7 +30,7 @@ def get_angles():
     hand_angle = []
     hip_angle = []
     cap = cv2.VideoCapture('/Users/tirthpatel/Desktop/project3/free_throw_made.mp4')
-    print("func")
+    count = 1
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         while cap.isOpened():
             ret, frame = cap.read()
@@ -64,14 +64,19 @@ def get_angles():
                 # Calculate the angle
                 angle = calculate_angle(right_shoulder, right_elbow, right_wrist)
                 cv2.putText(image, str(angle), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-                elbow_angle.append(round(angle, 1)) # Append the angle to the list
+                elbow_angle.append([count, round(angle, 1)]) # Append the angle to the list
                 angle = calculate_angle(right_elbow, right_wrist, right_hand)
-                hand_angle.append(round(angle, 1))
+                hand_angle.append([count, round(angle, 1)])
                 angle = calculate_angle(right_hip, right_shoulder, right_elbow)
-                hip_angle.append(round(angle, 1))
+                hip_angle.append([count,round(angle, 1)])
+                count += 1
     cap.release()
     cv2.destroyAllWindows()
-    return elbow_angle, hand_angle
+    return elbow_angle, hand_angle, hip_angle
 
 
-
+#get angles
+elbow_angle, hand_angle, hip_angle = get_angles()
+print(elbow_angle)
+print(hand_angle)
+print(hip_angle)
